@@ -3,7 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import pckg from "../package.json" with { type: "json" };
 
 export const server = new McpServer({
-  name: "Monobank MCP Server",
+  name: pckg.description,
   version: pckg.version,
 });
 
