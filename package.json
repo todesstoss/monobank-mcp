@@ -10,10 +10,10 @@
   },
   "keywords": [
     "monobank",
+    "mono",
     "mcp",
-    "model context protocol",
-    "server",
-    "typescript"
+    "mcp server",
+    "model context protocol"
   ],
   "engines": {
     "node": ">=23.6.0"
