@@ -14,6 +14,17 @@ const CurrencySchema = z.object({
 
 const CURRENCIES_CACHE_KEY = "currencies";
 
+export const getCurrencyRate = async (base: string, quote: string) => {
+  const rates = await getCurrencies();
+  return (
+    rates.find(
+      (r) =>
+        r.baseCurrency.toUpperCase() === base.toUpperCase() &&
+        r.quoteCurrency.toUpperCase() === quote.toUpperCase()
+    ) ?? null
+  );
+};
+
 export const getCurrencies = () =>
   cachedFetch(CURRENCIES_CACHE_KEY, async () => {
     const { data } = await publicMonobankApi<unknown>("/bank/currency");

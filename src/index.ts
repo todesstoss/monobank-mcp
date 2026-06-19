@@ -3,6 +3,7 @@ import { initCurrencyTool } from "./tools/currencyTool.ts";
 import { initClientInfoTool } from "./tools/clientInfoTool.ts";
 import { initStatementTool } from "./tools/statementTool.ts";
 import { initAccountsTool } from "./tools/accountsTool.ts";
+import { initCurrencyRateTool } from "./tools/currencyRateTool.ts";
 import {
   initGetWebhookTool,
   initSetWebhookTool,
@@ -14,6 +15,7 @@ const tools = [
   initClientInfoTool,
   initStatementTool,
   initAccountsTool,
+  initCurrencyRateTool,
   initGetWebhookTool,
   initSetWebhookTool,
   initUnsetWebhookTool,
