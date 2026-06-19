@@ -25,6 +25,22 @@ export const JarSchema = z.object({
   goal: z.number(),
 });
 
+const ManagedAccountSchema = z.object({
+  id: z.string(),
+  balance: z.number(),
+  creditLimit: z.number(),
+  type: z.string(),
+  currencyCode: z.number(),
+  iban: z.string(),
+});
+
+export const ManagedClientSchema = z.object({
+  clientId: z.string(),
+  tin: z.number(),
+  name: z.string(),
+  accounts: z.array(ManagedAccountSchema),
+});
+
 export const ClientInfoSchema = z.object({
   clientId: z.string(),
   name: z.string(),
@@ -32,6 +48,7 @@ export const ClientInfoSchema = z.object({
   permissions: z.string(),
   accounts: z.array(AccountSchema),
   jars: z.array(JarSchema).optional(),
+  managedClients: z.array(ManagedClientSchema).optional(),
 });
 
 export type Account = z.infer<typeof AccountSchema>;
@@ -46,7 +63,7 @@ export const invalidateClientInfoCache = () =>
 export const getClientInfo = () =>
   cachedFetch(CLIENT_INFO_CACHE_KEY, async () => {
     const { data } = await personalMonobankApi<unknown>("/client-info");
-    const { webHookUrl, permissions, accounts, jars, ...rest } =
+    const { webHookUrl, permissions, accounts, jars, managedClients, ...rest } =
       ClientInfoSchema.parse(data);
     return {
       ...rest,
@@ -65,6 +82,15 @@ export const getClientInfo = () =>
         currencyCode: resolveCurrencyCode(currencyCode),
         balance: balance / 100,
         goal: goal / 100,
+      })),
+      managedClients: managedClients?.map(({ accounts: mc, ...m }) => ({
+        ...m,
+        accounts: mc.map(({ currencyCode, balance, creditLimit, ...a }) => ({
+          ...a,
+          currencyCode: resolveCurrencyCode(currencyCode),
+          balance: balance / 100,
+          creditLimit: creditLimit / 100,
+        })),
       })),
     };
   });
