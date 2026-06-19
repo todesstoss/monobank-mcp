@@ -17,6 +17,13 @@ const addLoggingInterceptors = (instance: AxiosInstance) => {
         logger.error(
           `Request to ${error.config?.url} failed with error: ${error.message}`
         );
+        if (error.response?.status === 429) {
+          return Promise.reject(
+            new Error(
+              "Monobank rate limit reached. Personal endpoints allow 1 request per minute. Wait 60 seconds and try again."
+            )
+          );
+        }
       } else {
         logger.error(`Request failed with error: ${error}`);
       }
