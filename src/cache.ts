@@ -8,3 +8,14 @@ export const cache = new NodeCache({
 cache.on("set", (key) => {
   logger.info(`Cache saved for key: ${key}`);
 });
+
+export const cachedFetch = async <T>(
+  key: string,
+  fetcher: () => Promise<T>
+): Promise<T> => {
+  const cached = cache.get<T>(key);
+  if (cached) return cached;
+  const data = await fetcher();
+  cache.set(key, data);
+  return data;
+};

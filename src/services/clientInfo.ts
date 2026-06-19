@@ -1,6 +1,6 @@
 import type { CurrencyCodeRecord } from "currency-codes";
 import { personalMonobankApi } from "../api/monobankApi.ts";
-import { cache } from "../cache.ts";
+import { cachedFetch } from "../cache.ts";
 
 export interface Account {
   id: string;
@@ -35,16 +35,8 @@ export interface ClientInfo {
 
 const CLIENT_INFO_CACHE_KEY = "clientInfo";
 
-export const getClientInfo = async () => {
-  const cachedData = cache.get<ClientInfo>(CLIENT_INFO_CACHE_KEY);
-
-  if (cachedData) {
-    return cachedData;
-  }
-
-  const { data } = await personalMonobankApi<ClientInfo>("/client-info");
-
-  cache.set(CLIENT_INFO_CACHE_KEY, data);
-
-  return data;
-};
+export const getClientInfo = () =>
+  cachedFetch<ClientInfo>(CLIENT_INFO_CACHE_KEY, async () => {
+    const { data } = await personalMonobankApi<ClientInfo>("/client-info");
+    return data;
+  });

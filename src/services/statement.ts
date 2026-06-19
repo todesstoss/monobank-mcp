@@ -23,7 +23,7 @@ interface Statement {
   counterName: string;
 }
 
-interface GetStatementUrlPayload {
+interface GetStatementPayload {
   account: string;
   from: string;
   to?: string;
@@ -31,43 +31,32 @@ interface GetStatementUrlPayload {
 
 const STATEMENT_CACHE_BASE_KEY = "statement";
 
-interface GetStatementCacheKeyPayload
-  extends Omit<GetStatementUrlPayload, "to"> {
-  to: NonNullable<GetStatementUrlPayload["to"]>;
-}
+const resolveAccountId = (accountId: string) =>
+  accountId === "default" ? "0" : accountId;
 
-const getStatementCacheKey = ({
-  account,
-  from,
-  to,
-}: GetStatementCacheKeyPayload) =>
+const getStatementCacheKey = (account: string, from: string, to: string) =>
   `${STATEMENT_CACHE_BASE_KEY}-${account}-${from}-${to}`;
 
-const getStatementUrl = ({ account, from, to }: GetStatementUrlPayload) =>
+const getStatementUrl = (account: string, from: string, to?: string) =>
   `/statement/${account}/${from}${to ? `/${to}` : ""}`;
-
-interface GetStatementPayload extends GetStatementUrlPayload {}
 
 export const getStatement = async ({
   account,
   from,
   to,
 }: GetStatementPayload) => {
-  const cachedData = to
-    ? cache.get<Statement[]>(getStatementCacheKey({ account, from, to }))
+  const resolvedAccount = resolveAccountId(account);
+  const cacheKey = to
+    ? getStatementCacheKey(resolvedAccount, from, to)
     : undefined;
 
-  if (cachedData) {
-    return cachedData;
-  }
+  const cached = cacheKey ? cache.get<Statement[]>(cacheKey) : undefined;
+  if (cached) return cached;
 
   const { data } = await personalMonobankApi<Statement[]>(
-    getStatementUrl({ account, from, to })
+    getStatementUrl(resolvedAccount, from, to)
   );
 
-  if (to) {
-    cache.set(getStatementCacheKey({ account, from, to }), data);
-  }
-
+  if (cacheKey) cache.set(cacheKey, data);
   return data;
 };

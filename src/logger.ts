@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from "winston";
 
-const { combine, timestamp, errors, printf, json } = format;
+const { combine, timestamp, errors, printf } = format;
 
 export const logger = createLogger({
   level: "info",
