@@ -22,7 +22,7 @@ export const initStatementTool = (server: McpServer) => {
     "monobank-personal-statement",
     {
       description:
-        "Get monobank client statement. One month is maximum. toDate is optional and defaults to current date. Date format is ISO 8601. The 'amount', 'balance' fields in the statement items represents the transaction amount in the smallest currency unit (e.g., cents) and should be divided by 100 to get the actual amount in the base currency unit.",
+        "Returns a list of transactions for a Monobank account. Maximum range is 31 days per request.\n\nInputs:\n- accountId: account id from monobank-personal-client-info. Use '0' for the default UAH account.\n- fromDate: start of range, ISO 8601 with timezone (e.g. '2026-06-01T00:00:00+03:00').\n- toDate: end of range, ISO 8601 with timezone. Defaults to now if omitted.\n\nEach transaction:\n- amount: transaction amount in base currency unit. Negative = debit (money out), positive = credit (money in).\n- operationAmount: original amount in the operation currency (differs from amount when currencyCode != account currency).\n- currencyCode: ISO 4217 code of the operation currency.\n- balance: account balance after this transaction.\n- commissionRate / cashbackAmount: fee charged and cashback earned, in base currency unit.\n- mcc / originalMcc: Merchant Category Code (ISO 18245).\n- hold: true if the transaction is pending (not yet settled).\n- description: merchant or transfer name.\n- receiptId / invoiceId: identifiers for receipt lookup.\n- counterName / counterIban / counterEdrpou: counterparty info for transfers (present when available).",
       inputSchema,
       annotations: {
         readOnlyHint: true,

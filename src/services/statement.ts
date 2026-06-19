@@ -63,11 +63,27 @@ export const getStatement = async ({
   const parsed = z
     .array(StatementSchema)
     .parse(data)
-    .map((item) => ({
-      ...item,
-      time: formatUnixTimestamp(item.time),
-      currencyCode: resolveCurrencyCode(item.currencyCode),
-    }));
+    .map(
+      ({
+        time,
+        currencyCode,
+        amount,
+        operationAmount,
+        commissionRate,
+        cashbackAmount,
+        balance,
+        ...item
+      }) => ({
+        ...item,
+        time: formatUnixTimestamp(time),
+        currencyCode: resolveCurrencyCode(currencyCode),
+        amount: amount / 100,
+        operationAmount: operationAmount / 100,
+        commissionRate: commissionRate / 100,
+        cashbackAmount: cashbackAmount / 100,
+        balance: balance / 100,
+      })
+    );
   if (cacheKey) cache.set(cacheKey, parsed);
   return parsed;
 };
