@@ -20,10 +20,10 @@ export const getCurrencies = () =>
     return z
       .array(CurrencySchema)
       .parse(data)
-      .map((item) => ({
-        ...item,
-        currencyCodeA: resolveCurrencyCode(item.currencyCodeA),
-        currencyCodeB: resolveCurrencyCode(item.currencyCodeB),
-        date: formatUnixTimestamp(item.date),
+      .map(({ currencyCodeA, currencyCodeB, date, ...rest }) => ({
+        baseCurrency: resolveCurrencyCode(currencyCodeA),
+        quoteCurrency: resolveCurrencyCode(currencyCodeB),
+        date: formatUnixTimestamp(date),
+        ...rest,
       }));
   });

@@ -24,6 +24,12 @@ export const initStatementTool = (server: McpServer) => {
       description:
         "Get monobank client statement. One month is maximum. toDate is optional and defaults to current date. Date format is ISO 8601. The 'amount', 'balance' fields in the statement items represents the transaction amount in the smallest currency unit (e.g., cents) and should be divided by 100 to get the actual amount in the base currency unit.",
       inputSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
     },
     async ({ accountId, fromDate, toDate }) => {
       try {
