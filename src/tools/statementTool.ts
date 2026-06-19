@@ -4,20 +4,31 @@ import { getStatement } from "../services/statement.ts";
 import { toTextContent } from "./utils.ts";
 
 export const initStatementTool = (server: McpServer) => {
-  server.tool(
+  server.registerTool(
     "monobank-client-statement",
-    "Get monobank client statement. One month is maximum. toDate is optional and defaults to current date. Date format is ISO 8601. The 'amount', 'balance' fields in the statement items represents the transaction amount in the smallest currency unit (e.g., cents) and should be divided by 100 to get the actual amount in the base currency unit.",
     {
-      accountId: z.string(),
-      fromDate: z.string().datetime({ offset: true }),
-      toDate: z.string().datetime({ offset: true }).optional(),
+      description:
+        "Get monobank client statement. One month is maximum. toDate is optional and defaults to current date. Date format is ISO 8601. The 'amount', 'balance' fields in the statement items represents the transaction amount in the smallest currency unit (e.g., cents) and should be divided by 100 to get the actual amount in the base currency unit.",
+      inputSchema: {
+        accountId: z.string(),
+        fromDate: z.string().datetime({ offset: true }),
+        toDate: z.string().datetime({ offset: true }).optional(),
+      },
     },
     async ({ accountId, fromDate, toDate }) => {
-      const from = isoToUnixString(fromDate);
-      const to = toDate ? isoToUnixString(toDate) : undefined;
-      return toTextContent(
-        await getStatement({ account: accountId, from, to })
-      );
+      try {
+        const from = isoToUnixString(fromDate);
+        const to = toDate ? isoToUnixString(toDate) : undefined;
+        return toTextContent(
+          await getStatement({ account: accountId, from, to })
+        );
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        return {
+          content: [{ type: "text" as const, text: message }],
+          isError: true as const,
+        };
+      }
     }
   );
 };
