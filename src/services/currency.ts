@@ -1,20 +1,20 @@
-import type { CurrencyCodeRecord } from "currency-codes";
+import { z } from "zod";
 import { publicMonobankApi } from "../api/monobankApi.ts";
 import { cachedFetch } from "../cache.ts";
 
-interface Currency {
-  currencyCodeA: CurrencyCodeRecord["number"];
-  currencyCodeB: CurrencyCodeRecord["number"];
-  date: number;
-  rateSell: number;
-  rateBuy: number;
-  rateCross: number;
-}
+const CurrencySchema = z.object({
+  currencyCodeA: z.number(),
+  currencyCodeB: z.number(),
+  date: z.number(),
+  rateSell: z.number().optional(),
+  rateBuy: z.number().optional(),
+  rateCross: z.number().optional(),
+});
 
 const CURRENCIES_CACHE_KEY = "currencies";
 
 export const getCurrencies = () =>
-  cachedFetch<Currency[]>(CURRENCIES_CACHE_KEY, async () => {
-    const { data } = await publicMonobankApi<Currency[]>("/bank/currency");
-    return data;
+  cachedFetch(CURRENCIES_CACHE_KEY, async () => {
+    const { data } = await publicMonobankApi<unknown>("/bank/currency");
+    return z.array(CurrencySchema).parse(data);
   });

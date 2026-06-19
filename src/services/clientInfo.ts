@@ -1,42 +1,46 @@
-import type { CurrencyCodeRecord } from "currency-codes";
+import { z } from "zod";
 import { personalMonobankApi } from "../api/monobankApi.ts";
 import { cachedFetch } from "../cache.ts";
 
-export interface Account {
-  id: string;
-  sendId: string;
-  balance: number;
-  creditLimit: number;
-  type: string;
-  currencyCode: CurrencyCodeRecord["number"];
-  cashbackType: CurrencyCodeRecord["code"];
-  maskedPan: string[];
-  iban: string;
-}
+export const AccountSchema = z.object({
+  id: z.string(),
+  sendId: z.string(),
+  balance: z.number(),
+  creditLimit: z.number(),
+  type: z.string(),
+  currencyCode: z.number(),
+  cashbackType: z.string(),
+  maskedPan: z.array(z.string()),
+  iban: z.string(),
+});
 
-export interface Jar {
-  id: string;
-  sendId: string;
-  title: string;
-  description: string;
-  currencyCode: CurrencyCodeRecord["number"];
-  balance: number;
-  goal: number;
-}
+export const JarSchema = z.object({
+  id: z.string(),
+  sendId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  currencyCode: z.number(),
+  balance: z.number(),
+  goal: z.number(),
+});
 
-export interface ClientInfo {
-  clientId: string;
-  name: string;
-  webHookUrl: string;
-  permissions: string;
-  accounts: Account[];
-  jars?: Jar[];
-}
+export const ClientInfoSchema = z.object({
+  clientId: z.string(),
+  name: z.string(),
+  webHookUrl: z.string(),
+  permissions: z.string(),
+  accounts: z.array(AccountSchema),
+  jars: z.array(JarSchema).optional(),
+});
+
+export type Account = z.infer<typeof AccountSchema>;
+export type Jar = z.infer<typeof JarSchema>;
+export type ClientInfo = z.infer<typeof ClientInfoSchema>;
 
 const CLIENT_INFO_CACHE_KEY = "clientInfo";
 
 export const getClientInfo = () =>
-  cachedFetch<ClientInfo>(CLIENT_INFO_CACHE_KEY, async () => {
-    const { data } = await personalMonobankApi<ClientInfo>("/client-info");
-    return data;
+  cachedFetch(CLIENT_INFO_CACHE_KEY, async () => {
+    const { data } = await personalMonobankApi<unknown>("/client-info");
+    return ClientInfoSchema.parse(data);
   });
