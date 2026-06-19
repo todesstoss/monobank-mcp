@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { publicMonobankApi } from "../api/monobankApi.ts";
 import { cachedFetch } from "../cache.ts";
+import { resolveCurrencyCode, formatUnixTimestamp } from "../utils.ts";
 
 const CurrencySchema = z.object({
   currencyCodeA: z.number(),
@@ -16,5 +17,13 @@ const CURRENCIES_CACHE_KEY = "currencies";
 export const getCurrencies = () =>
   cachedFetch(CURRENCIES_CACHE_KEY, async () => {
     const { data } = await publicMonobankApi<unknown>("/bank/currency");
-    return z.array(CurrencySchema).parse(data);
+    return z
+      .array(CurrencySchema)
+      .parse(data)
+      .map((item) => ({
+        ...item,
+        currencyCodeA: resolveCurrencyCode(item.currencyCodeA),
+        currencyCodeB: resolveCurrencyCode(item.currencyCodeB),
+        date: formatUnixTimestamp(item.date),
+      }));
   });

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { personalMonobankApi } from "../api/monobankApi.ts";
 import { cache } from "../cache.ts";
+import { resolveCurrencyCode, formatUnixTimestamp } from "../utils.ts";
 
 const StatementSchema = z.object({
   id: z.string(),
@@ -59,7 +60,14 @@ export const getStatement = async ({
     getStatementUrl(resolvedAccount, from, to)
   );
 
-  const parsed = z.array(StatementSchema).parse(data);
+  const parsed = z
+    .array(StatementSchema)
+    .parse(data)
+    .map((item) => ({
+      ...item,
+      time: formatUnixTimestamp(item.time),
+      currencyCode: resolveCurrencyCode(item.currencyCode),
+    }));
   if (cacheKey) cache.set(cacheKey, parsed);
   return parsed;
 };

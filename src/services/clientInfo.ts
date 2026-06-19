@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { personalMonobankApi } from "../api/monobankApi.ts";
 import { cachedFetch } from "../cache.ts";
+import { resolveCurrencyCode } from "../utils.ts";
 
 export const AccountSchema = z.object({
   id: z.string(),
@@ -42,5 +43,16 @@ const CLIENT_INFO_CACHE_KEY = "clientInfo";
 export const getClientInfo = () =>
   cachedFetch(CLIENT_INFO_CACHE_KEY, async () => {
     const { data } = await personalMonobankApi<unknown>("/client-info");
-    return ClientInfoSchema.parse(data);
+    const raw = ClientInfoSchema.parse(data);
+    return {
+      ...raw,
+      accounts: raw.accounts.map((a) => ({
+        ...a,
+        currencyCode: resolveCurrencyCode(a.currencyCode),
+      })),
+      jars: raw.jars?.map((j) => ({
+        ...j,
+        currencyCode: resolveCurrencyCode(j.currencyCode),
+      })),
+    };
   });
