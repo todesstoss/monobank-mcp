@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier --write .",
     "start": "node src/index.ts",
-    "inspect": "npx @modelcontextprotocol/inspector node --watch src/index.ts"
+    "inspect": "mcp-inspector node --watch src/index.ts"
   },
   "keywords": [
     "monobank",
