@@ -9,6 +9,8 @@ cache.on("set", (key) => {
   logger.info(`Cache saved for key: ${key}`);
 });
 
+export const invalidate = (key: string) => cache.del(key);
+
 export const cachedFetch = async <T>(
   key: string,
   fetcher: () => Promise<T>

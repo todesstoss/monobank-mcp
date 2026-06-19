@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { personalMonobankApi } from "../api/monobankApi.ts";
-import { cachedFetch } from "../cache.ts";
+import { invalidate, cachedFetch } from "../cache.ts";
 import { resolveCurrencyCode, decodePermissions } from "../utils.ts";
 
 export const AccountSchema = z.object({
@@ -39,6 +39,9 @@ export type Jar = z.infer<typeof JarSchema>;
 export type ClientInfo = z.infer<typeof ClientInfoSchema>;
 
 const CLIENT_INFO_CACHE_KEY = "clientInfo";
+
+export const invalidateClientInfoCache = () =>
+  invalidate(CLIENT_INFO_CACHE_KEY);
 
 export const getClientInfo = () =>
   cachedFetch(CLIENT_INFO_CACHE_KEY, async () => {
