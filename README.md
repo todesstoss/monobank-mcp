@@ -90,7 +90,7 @@ Monobank personal endpoints allow **1 request per 60 seconds**. If the limit is 
 Requires Node.js ≥ 24.17.0 and pnpm.
 
 ```bash
-git clone https://github.com/dirgen/monobank-mcp
+git clone https://github.com/todesstoss/monobank-mcp
 cd monobank-mcp
 pnpm install
 ```
