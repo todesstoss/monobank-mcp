@@ -23,7 +23,8 @@
     "start": "node src/index.ts",
     "inspect": "dotenv mcp-inspector node src/index.ts",
     "prepare": "husky || true",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "lint-staged": {
     "src/**/*.{ts,js}": [
