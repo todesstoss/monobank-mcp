@@ -16,7 +16,9 @@ export const cachedFetch = async <T>(
   fetcher: () => Promise<T>
 ): Promise<T> => {
   const cached = cache.get<T>(key);
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
   const data = await fetcher();
   cache.set(key, data);
   return data;

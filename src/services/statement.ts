@@ -27,7 +27,9 @@ export const getStatement = async ({
     : undefined;
 
   const cached = cacheKey ? cache.get(cacheKey) : undefined;
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
 
   const raw = await api.statement(resolvedAccount, from, to);
   const parsed = raw.map(
@@ -52,6 +54,8 @@ export const getStatement = async ({
     })
   );
 
-  if (cacheKey) cache.set(cacheKey, parsed);
+  if (cacheKey) {
+    cache.set(cacheKey, parsed);
+  }
   return parsed;
 };
