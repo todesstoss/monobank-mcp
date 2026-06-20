@@ -48,7 +48,9 @@ export class MonobankApi {
 
     this.options.onSuccess?.(url, response.status);
     const text = await response.text();
-    if (!text) return undefined;
+    if (!text) {
+      return undefined;
+    }
     try {
       return JSON.parse(text) as unknown;
     } catch (e) {
@@ -62,8 +64,9 @@ export class MonobankApi {
   }
 
   private personalRequest(path: string, init?: RequestInit) {
-    if (!this.token)
+    if (!this.token) {
       throw new Error("MonobankApi: token is required for personal endpoints");
+    }
     return this.request(`${BASE_URL}/personal${path}`, {
       ...init,
       headers: { "X-Token": this.token, ...init?.headers },

@@ -11,6 +11,7 @@ export default [
     plugins: { prettier: prettierPlugin },
     rules: {
       "prettier/prettier": "error",
+      curly: ["error", "all"],
     },
   },
 ];
