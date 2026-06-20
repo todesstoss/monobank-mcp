@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "start": "node src/index.ts",
-    "inspect": "mcp-inspector node src/index.ts",
+    "inspect": "dotenv mcp-inspector node src/index.ts",
     "prepare": "husky",
     "lint": "eslint src"
   },
@@ -32,7 +32,6 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "axios": "^1.18.0",
     "currency-codes": "^2.2.0",
     "dotenv": "^17.4.2",
     "node-cache": "^5.1.2",
@@ -43,6 +42,7 @@
     "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/inspector": "^0.22.0",
     "@types/node": "^25.9.3",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
