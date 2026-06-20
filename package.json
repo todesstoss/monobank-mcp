@@ -1,5 +1,5 @@
 {
-  "name": "@todesstoss/monobank-mcp",
+  "name": "@dirgen/monobank-mcp",
   "version": "1.0.0",
   "description": "MCP server for Monobank — accounts, transactions, exchange rates, and webhooks for Claude and other MCP clients",
   "type": "module",

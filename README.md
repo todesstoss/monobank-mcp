@@ -1,6 +1,6 @@
 # monobank-mcp
 
-[![npm version](https://img.shields.io/npm/v/@todesstoss/monobank-mcp)](https://www.npmjs.com/package/@todesstoss/monobank-mcp)
+[![npm version](https://img.shields.io/npm/v/@dirgen/monobank-mcp)](https://www.npmjs.com/package/@dirgen/monobank-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D24.17.0-brightgreen)](https://nodejs.org)
 
@@ -17,7 +17,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "monobank": {
       "command": "npx",
-      "args": ["-y", "@todesstoss/monobank-mcp"],
+      "args": ["-y", "@dirgen/monobank-mcp"],
       "env": {
         "MONOBANK_API_TOKEN": "your_token_here"
       }
@@ -29,7 +29,7 @@ Add to your `claude_desktop_config.json`:
 ## Quick Start — Claude Code
 
 ```bash
-claude mcp add monobank -- npx -y @todesstoss/monobank-mcp
+claude mcp add monobank -- npx -y @dirgen/monobank-mcp
 ```
 
 Then add your token to `.claude/settings.json`:
@@ -90,7 +90,7 @@ Monobank personal endpoints allow **1 request per 60 seconds**. If the limit is 
 Requires Node.js ≥ 24.17.0 and pnpm.
 
 ```bash
-git clone https://github.com/todesstoss/monobank-mcp
+git clone https://github.com/dirgen/monobank-mcp
 cd monobank-mcp
 pnpm install
 ```
