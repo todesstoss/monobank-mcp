@@ -32,12 +32,14 @@
   },
   "keywords": [
     "monobank",
-    "mono",
     "monobank mcp",
-    "monobank mcp server",
+    "monobank api",
     "mcp",
     "mcp server",
-    "model context protocol"
+    "model context protocol",
+    "claude",
+    "banking",
+    "ukraine"
   ],
   "engines": {
     "node": ">=24.17.0"
