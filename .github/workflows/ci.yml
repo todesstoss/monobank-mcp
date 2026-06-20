@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run lint
+      - run: pnpm run format:check
+      - run: pnpm run typecheck
+      - run: pnpm run build
+
+  version-changed:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository == 'todesstoss/monobank-mcp'
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compare package.json version to previous master commit
+        id: check
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "No prior SHA on this ref; skip tag/release/publish (avoid unintended first automation)."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          NEW_VER=$(jq -r .version package.json)
+          set +e
+          PREV_JSON=$(git show "${BEFORE}:package.json" 2>/dev/null)
+          PREV_OK=$?
+          set -e
+          if [ "$PREV_OK" -ne 0 ] || [ -z "$PREV_JSON" ]; then
+            echo "Could not read package.json at before SHA; skip."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OLD_VER=$(echo "$PREV_JSON" | jq -r .version)
+          if [ "$OLD_VER" = "null" ] || [ -z "$OLD_VER" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$NEW_VER" != "$OLD_VER" ]; then
+            echo "Version changed: ${OLD_VER} -> ${NEW_VER}"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version unchanged (${NEW_VER}); skip tag, release, and publish."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  tag-release:
+    needs: [ci, version-changed]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository == 'todesstoss/monobank-mcp' && needs.ci.result == 'success' && needs.version-changed.outputs.changed == 'true'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create annotated tag and GitHub release from CHANGELOG
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION=$(jq -r .version package.json)
+          TAG="v${VERSION}"
+
+          if git ls-remote --tags origin "refs/tags/${TAG}" | grep -q .; then
+            echo "Tag ${TAG} already exists on origin, skipping tag and release."
+            exit 0
+          fi
+
+          BODY=$(mktemp)
+          awk -v v="$VERSION" '
+            $0 == "## " v { capture = 1; next }
+            capture && $0 ~ /^## / { exit }
+            capture { print }
+          ' CHANGELOG.md > "$BODY"
+
+          if [[ ! -s "$BODY" ]]; then
+            echo "::error::CHANGELOG.md has no section matching exactly \"## ${VERSION}\" (add release notes before bumping version)."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "${TAG}" -F "$BODY"
+          git push origin "refs/tags/${TAG}"
+
+          gh release create "${TAG}" --title "${TAG}" --notes-file "$BODY"
+          rm -f "$BODY"
+
+  publish:
+    needs: [ci, tag-release]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.repository == 'todesstoss/monobank-mcp'
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run build
+
+      - name: Publish to npm (OIDC)
+        run: npm publish --access public

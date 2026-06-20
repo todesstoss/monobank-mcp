@@ -1,6 +1,6 @@
 {
   "name": "@todesstoss/monobank-mcp",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "MCP server for Monobank — accounts, transactions, exchange rates, and webhooks for Claude and other MCP clients",
   "type": "module",
   "main": "dist/index.mjs",
@@ -19,6 +19,7 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "start": "node src/index.ts",
     "inspect": "dotenv mcp-inspector node src/index.ts",
     "prepare": "husky || true",

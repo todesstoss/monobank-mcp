@@ -52,32 +52,32 @@ Open [api.monobank.ua](https://api.monobank.ua/index.html) and scan the QR code 
 
 ### Public — no token required
 
-| Tool | Description |
-|---|---|
-| `monobank-bank-currency` | All Monobank exchange rates. Returns `baseCurrency` / `quoteCurrency` (ISO 4217), `date` (ISO 8601), and `rateSell` / `rateBuy` (traded pairs) or `rateCross` (cross rates). |
-| `monobank-bank-currency-rate` | Exchange rate for a single currency pair. Inputs: `baseCurrency`, `quoteCurrency` (defaults to `UAH`). Faster than fetching the full list. |
+| Tool                          | Description                                                                                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `monobank-bank-currency`      | All Monobank exchange rates. Returns `baseCurrency` / `quoteCurrency` (ISO 4217), `date` (ISO 8601), and `rateSell` / `rateBuy` (traded pairs) or `rateCross` (cross rates). |
+| `monobank-bank-currency-rate` | Exchange rate for a single currency pair. Inputs: `baseCurrency`, `quoteCurrency` (defaults to `UAH`). Faster than fetching the full list.                                   |
 
 ### Personal — requires `MONOBANK_API_TOKEN`
 
-| Tool | Description |
-|---|---|
+| Tool                            | Description                                                                                                                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `monobank-personal-client-info` | Full client profile: identity, decoded token permissions, all accounts and jars including FOP/business accounts (`managedClients`). Account `id` fields are what you pass to the statement tool. |
-| `monobank-personal-accounts` | Compact account and jar list (id, type, currencyCode, balance, maskedPan). Use this for quick account discovery before fetching statements. |
-| `monobank-personal-statement` | Transaction history for an account. Inputs: `accountId` (from client-info, or `"0"` for default UAH account), `fromDate`, `toDate` (ISO 8601 with timezone). Maximum range: 31 days per request. |
-| `monobank-get-webhook` | Returns the webhook URL currently configured for this token. Empty string means no webhook is set. |
-| `monobank-set-webhook` | ⚠️ **Destructive.** Sets the webhook URL. Overwrites the existing URL immediately with no confirmation — check the current value with `monobank-get-webhook` first. |
-| `monobank-unset-webhook` | ⚠️ **Destructive.** Removes the webhook by setting the URL to empty string. |
+| `monobank-personal-accounts`    | Compact account and jar list (id, type, currencyCode, balance, maskedPan). Use this for quick account discovery before fetching statements.                                                      |
+| `monobank-personal-statement`   | Transaction history for an account. Inputs: `accountId` (from client-info, or `"0"` for default UAH account), `fromDate`, `toDate` (ISO 8601 with timezone). Maximum range: 31 days per request. |
+| `monobank-get-webhook`          | Returns the webhook URL currently configured for this token. Empty string means no webhook is set.                                                                                               |
+| `monobank-set-webhook`          | ⚠️ **Destructive.** Sets the webhook URL. Overwrites the existing URL immediately with no confirmation — check the current value with `monobank-get-webhook` first.                              |
+| `monobank-unset-webhook`        | ⚠️ **Destructive.** Removes the webhook by setting the URL to empty string.                                                                                                                      |
 
 ## Caching
 
 The server caches responses to stay within Monobank's rate limits and avoid redundant API calls:
 
-| Data | Cache TTL |
-|---|---|
-| Client info (`/personal/client-info`) | 1 hour |
-| Currency rates (`/bank/currency`) | 1 hour |
-| Statement with a fixed `toDate` | 1 hour |
-| Statement without `toDate` | Not cached (open-ended range → stale data risk) |
+| Data                                  | Cache TTL                                       |
+| ------------------------------------- | ----------------------------------------------- |
+| Client info (`/personal/client-info`) | 1 hour                                          |
+| Currency rates (`/bank/currency`)     | 1 hour                                          |
+| Statement with a fixed `toDate`       | 1 hour                                          |
+| Statement without `toDate`            | Not cached (open-ended range → stale data risk) |
 
 Webhook mutations automatically invalidate the client-info cache so the next read reflects the updated URL.
 
