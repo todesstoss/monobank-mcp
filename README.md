@@ -118,7 +118,7 @@ pnpm lint        # lint src/
 
 **Currency pair not found** — use `monobank-bank-currency` to see all available pairs. Only UAH pairs and EUR/USD are available.
 
-**No `managedClients` in client-info** — this field is only present for FOP/business tokens (identified by a `tin` field). Personal tokens won't have it.
+**No `managedClients` in client-info** — this field only appears if you are registered as a FOP (sole proprietor) with Monobank. All tokens are the same personal token — `managedClients` is simply absent if you have no FOP accounts.
 
 ## License
 
