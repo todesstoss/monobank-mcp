@@ -48,7 +48,13 @@ export class MonobankApi {
 
     this.options.onSuccess?.(url, response.status);
     const text = await response.text();
-    return text ? (JSON.parse(text) as unknown) : undefined;
+    if (!text) return undefined;
+    try {
+      return JSON.parse(text) as unknown;
+    } catch (e) {
+      this.options.onError?.(url, e);
+      throw e;
+    }
   }
 
   private publicGet(path: string) {

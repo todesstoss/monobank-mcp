@@ -25,7 +25,7 @@ export const JarSchema = z.object({
   id: z.string(),
   sendId: z.string(),
   title: z.string(),
-  description: z.string(),
+  description: z.string().optional(),
   currencyCode: z.number(),
   balance: z.number(),
   goal: z.number(),
